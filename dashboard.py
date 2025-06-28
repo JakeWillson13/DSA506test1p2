@@ -6,6 +6,9 @@ import plotly.graph_objects as go
 st.set_page_config(page_title="University Dashboard", layout="wide")
 st.title("University Growth & Department Enrollment Dashboard")
 
+COMMON_MARGIN = dict(l=150, r=50, t=40, b=50)
+MENU_POS      = dict(x=0.02, y=1.15)   # same menu coordinates for both charts
+
 # ──────────────────────────────────────────
 # Figure 1 – Overall metrics
 # ──────────────────────────────────────────
@@ -19,11 +22,10 @@ df1 = pd.DataFrame(overall_data).melt(
     id_vars="Metric", var_name="Category", value_name="Percent"
 )
 
-metrics1  = df1["Metric"].unique()
-palette1  = ["#1f77b4", "#2ca02c", "#d62728"]
-fig1      = go.Figure()
+palette1 = ["#1f77b4", "#2ca02c", "#d62728"]
+fig1     = go.Figure()
 
-for i, m in enumerate(metrics1):
+for i, m in enumerate(df1["Metric"].unique()):
     sub = df1[df1["Metric"] == m]
     fig1.add_bar(
         x=sub["Category"],
@@ -35,28 +37,26 @@ for i, m in enumerate(metrics1):
         visible=i == 0,
     )
 
+# toggle metric buttons
 buttons1 = []
-for i, m in enumerate(metrics1):
+for i, m in enumerate(df1["Metric"].unique()):
     ymax = df1.query("Metric == @m")["Percent"].max() * 1.1
-    vis  = [i == j for j in range(len(metrics1))]
+    vis  = [i == j for j in range(len(df1["Metric"].unique()))]
     buttons1.append(
         dict(
             label=m,
             method="update",
-            args=[
-                {"visible": vis},
-                {"yaxis": {"range": [0, ymax]}}
-            ],
+            args=[{"visible": vis}, {"yaxis": {"range": [0, ymax]}}],
         )
     )
 
 fig1.update_layout(
-    updatemenus=[dict(buttons=buttons1, x=0.02, y=1.15, showactive=True)],
+    updatemenus=[dict(buttons=buttons1, **MENU_POS, showactive=True)],
     template="plotly_white",
     bargap=0.3,
     height=450,
     yaxis_title="Percent",
-    margin=dict(l=150, r=50, t=40, b=50),
+    margin=COMMON_MARGIN,
 )
 
 # ──────────────────────────────────────────
@@ -69,7 +69,7 @@ dept_data = {
     "2024 Increase": [ 6.1,  7.1,  5.3, -13.0],
 }
 df2      = pd.DataFrame(dept_data).set_index("Department")
-metrics2 = df2.columns.tolist()          # ["Average YoY","2024 Increase"]
+metrics2 = df2.columns.tolist()
 depts    = df2.index.tolist()
 colors2  = ["#1f77b4", "#ff7f0e"]
 fig2     = go.Figure()
@@ -101,7 +101,7 @@ for i, d in enumerate(depts):
             method="update",
             args=[
                 {"visible": vis},
-                {"yaxis": {"range": yrange, "title": "Percent"}}
+                {"yaxis": {"range": yrange, "title": "Percent"}},
             ],
         )
     )
@@ -112,15 +112,15 @@ fig2.update_layout(
     updatemenus=[dict(
         buttons=buttons2,
         direction="down",
-        x=0.13, y=1.15,
+        **MENU_POS,
         xanchor="left", yanchor="top",
         pad={"l": 10, "t": 10},
         showactive=True,
     )],
     template="plotly_white",
-    height=450,                  # same height as fig1
+    height=450,
     yaxis=dict(range=init_yrange, title="Percent"),
-    margin=dict(l=150, r=20, t=40, b=50),
+    margin=COMMON_MARGIN,
 )
 
 # ──────────────────────────────────────────
