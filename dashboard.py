@@ -56,7 +56,7 @@ fig1.update_layout(
     bargap=0.3,
     height=450,
     yaxis_title="Percent",
-    margin=dict(l=50, r=50, t=40, b=50),
+    margin=dict(l=150, r=50, t=40, b=50),
 )
 
 # ──────────────────────────────────────────
