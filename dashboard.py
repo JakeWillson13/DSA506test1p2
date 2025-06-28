@@ -120,7 +120,7 @@ fig2.update_layout(
     updatemenus=[dict(
         buttons=buttons2,
         direction="down",
-        x=0.0, y=0.8,
+        x=0.02, y=1.15,
         xanchor="left", yanchor="top",
         pad={"l": 10, "t": 10},
         showactive=True,
