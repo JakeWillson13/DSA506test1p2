@@ -97,7 +97,7 @@ ymin, ymax = df2.values.min() * 1.2, df2.values.max() * 1.2
 fig2.update_layout(
     updatemenus=[dict(
         buttons=buttons2,
-        direction="v",
+        direction="down",
         x=0.0, y=0.8,
         xanchor="left", yanchor="top",
         pad={"l": 10, "t": 10},
