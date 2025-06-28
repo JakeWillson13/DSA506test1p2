@@ -4,7 +4,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 st.set_page_config(page_title="University Dashboard", layout="wide")
-st.title("University Growth & Dept. Enrollment Dashboard")
+st.title("University Growth & Enrollment Dashboard")
 
 # ────────────────────────────────────────────
 # Figure 1 – Overall metrics (3-bar view)
@@ -135,7 +135,7 @@ fig2.update_layout(
 # ────────────────────────────────────────────
 # Streamlit layout (two tabs)
 # ────────────────────────────────────────────
-tab1, tab2 = st.tabs(["Overall Metrics", "Deptartment Metrics"])
+tab1, tab2 = st.tabs(["Overall Metrics", "Department Metrics"])
 with tab1:
     st.plotly_chart(fig1, use_container_width=True)
 with tab2:
