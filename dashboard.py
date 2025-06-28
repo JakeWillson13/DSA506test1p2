@@ -125,7 +125,7 @@ fig2.update_layout(
         pad={"l": 10, "t": 10},
         showactive=True,
     )],
-    title=f"{depts[0]}: Enrollment % Changes",
+    title=f"{depts[0]}: Percent Changes",
     title_x=0.5,
     template="plotly_white",
     yaxis=dict(range=init_yrange, title="Percent"),
