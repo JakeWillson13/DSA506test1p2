@@ -73,7 +73,7 @@ dept_data = {
     "2024 Increase": [ 6.1,  7.1,  5.3, -13.0],
 }
 df2      = pd.DataFrame(dept_data).set_index("Department")
-metrics2 = df2.columns.tolist()        # ["Average YoY", "2024 Increase"]
+metrics2 = df2.columns.tolist()
 depts    = df2.index.tolist()
 colors2  = ["#1f77b4", "#ff7f0e"]
 fig2     = go.Figure()
@@ -89,13 +89,12 @@ for i, d in enumerate(depts):
         visible=i == 0,
     )
 
-# helper to build symmetric y-ranges with padding
-def pad_range(lo: float, hi: float, pct: float = 0.10):
+def pad_range(lo, hi, pct=0.10):
     span = max(abs(lo), abs(hi))
     pad  = span * pct
     return [lo - pad, hi + pad] if lo < hi else [hi - pad, lo + pad]
 
-# buttons to toggle department with per-dept scaling
+# per-department y-axis scaling
 buttons2 = []
 for i, d in enumerate(depts):
     vis    = [j == i for j in range(len(depts))]
@@ -113,7 +112,6 @@ for i, d in enumerate(depts):
         )
     )
 
-# initial y-axis for first department
 init_yrange = pad_range(df2.iloc[0].min(), df2.iloc[0].max())
 
 fig2.update_layout(
@@ -126,11 +124,13 @@ fig2.update_layout(
         showactive=True,
     )],
     title=f"{depts[0]} % Changes",
-    title_x=0.5,
+    title_x=0.0,                 # ← left-align title
+    title_xanchor="left",        #     (anchor left edge)
     template="plotly_white",
     yaxis=dict(range=init_yrange, title="Percent"),
     margin=dict(l=150, r=20, t=50, b=50),
 )
+
 
 # ────────────────────────────────────────────
 # Streamlit layout (two tabs)
