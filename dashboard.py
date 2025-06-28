@@ -107,7 +107,7 @@ for i, d in enumerate(depts):
             method="update",
             args=[
                 {"visible": vis},
-                {"title": f"{d}: Enrollment % Changes",
+                {"title": f"{d} % Changes",
                  "yaxis": {"range": yrange, "title": "Percent"}}
             ],
         )
@@ -125,7 +125,7 @@ fig2.update_layout(
         pad={"l": 10, "t": 10},
         showactive=True,
     )],
-    title=f"{depts[0]}: Enrollment % Changes",
+    title=f"{depts[0]} % Changes",
     title_x=0.5,
     template="plotly_white",
     yaxis=dict(range=init_yrange, title="Percent"),
@@ -135,7 +135,7 @@ fig2.update_layout(
 # ────────────────────────────────────────────
 # Streamlit layout (two tabs)
 # ────────────────────────────────────────────
-tab1, tab2 = st.tabs(["Overall Metrics", "Dept. Enrollment % Changes"])
+tab1, tab2 = st.tabs(["Overall Metrics", "Deptartment Metrics"])
 with tab1:
     st.plotly_chart(fig1, use_container_width=True)
 with tab2:
