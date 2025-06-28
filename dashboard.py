@@ -6,20 +6,22 @@ import plotly.graph_objects as go
 st.set_page_config(page_title="University Dashboard", layout="wide")
 st.title("University Growth & Department Enrollment Dashboard")
 
-# ── Figure 1 ──────────────────────────────────────────────────────────
+# ──────────────────────────────────────────
+# Figure 1 – Overall metrics
+# ──────────────────────────────────────────
 overall_data = {
     "Metric": ["Total Increase", "Average YoY", "CAGR"],
     "Applications": [40.0, 1.8, 3.8],
     "Admissions":   [40.0, 1.8, 3.8],
     "Enrollments":  [33.3, 1.5, 3.2],
 }
-df1 = pd.DataFrame(overall_data).melt(id_vars="Metric",
-                                      var_name="Category",
-                                      value_name="Percent")
+df1 = pd.DataFrame(overall_data).melt(
+    id_vars="Metric", var_name="Category", value_name="Percent"
+)
 
-palette1 = ["#1f77b4", "#2ca02c", "#d62728"]
-metrics1 = df1["Metric"].unique()
-fig1     = go.Figure()
+metrics1  = df1["Metric"].unique()
+palette1  = ["#1f77b4", "#2ca02c", "#d62728"]
+fig1      = go.Figure()
 
 for i, m in enumerate(metrics1):
     sub = df1[df1["Metric"] == m]
@@ -43,23 +45,23 @@ for i, m in enumerate(metrics1):
             method="update",
             args=[
                 {"visible": vis},
-                {"title": {"text": m, "x": 0.5},      # keep it centred
-                 "yaxis": {"range": [0, ymax]}}
+                {"yaxis": {"range": [0, ymax]}}
             ],
         )
     )
 
 fig1.update_layout(
     updatemenus=[dict(buttons=buttons1, x=0.02, y=1.15, showactive=True)],
-    title=dict(text=metrics1[0], x=0.5),
     template="plotly_white",
     bargap=0.3,
     height=450,
     yaxis_title="Percent",
-    margin=dict(l=50, r=50, t=100, b=50),
+    margin=dict(l=50, r=50, t=40, b=50),
 )
 
-# ── Figure 2 ──────────────────────────────────────────────────────────
+# ──────────────────────────────────────────
+# Figure 2 – Department enrollment % changes
+# ──────────────────────────────────────────
 dept_data = {
     "Department": ["Arts Enrolled", "Business Enrolled",
                    "Engineering Enrolled", "Science Enrolled"],
@@ -67,7 +69,7 @@ dept_data = {
     "2024 Increase": [ 6.1,  7.1,  5.3, -13.0],
 }
 df2      = pd.DataFrame(dept_data).set_index("Department")
-metrics2 = df2.columns.tolist()
+metrics2 = df2.columns.tolist()          # ["Average YoY","2024 Increase"]
 depts    = df2.index.tolist()
 colors2  = ["#1f77b4", "#ff7f0e"]
 fig2     = go.Figure()
@@ -99,8 +101,7 @@ for i, d in enumerate(depts):
             method="update",
             args=[
                 {"visible": vis},
-                {"title": {"text": f"{d} Percent Change", "x": 0.0},  # anchor left
-                 "yaxis": {"range": yrange, "title": "Percent"}}
+                {"yaxis": {"range": yrange, "title": "Percent"}}
             ],
         )
     )
@@ -116,16 +117,17 @@ fig2.update_layout(
         pad={"l": 10, "t": 10},
         showactive=True,
     )],
-    title=dict(text=f"{depts[0]} Percent Change", x=0.0),   # left-aligned
     template="plotly_white",
+    height=450,                  # same height as fig1
     yaxis=dict(range=init_yrange, title="Percent"),
-    margin=dict(l=150, r=20, t=50, b=50),
+    margin=dict(l=150, r=20, t=40, b=50),
 )
 
-# ── Streamlit layout ────────────────────────────────────────────────
+# ──────────────────────────────────────────
+# Streamlit layout (tabs)
+# ──────────────────────────────────────────
 tab1, tab2 = st.tabs(["Overall Metrics", "Department Metrics"])
 with tab1:
     st.plotly_chart(fig1, use_container_width=True)
 with tab2:
     st.plotly_chart(fig2, use_container_width=True)
-
