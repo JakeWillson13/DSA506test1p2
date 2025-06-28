@@ -129,7 +129,7 @@ fig2.update_layout(
     title_x=0.5,
     template="plotly_white",
     yaxis=dict(range=init_yrange, title="Percent"),
-    margin=dict(l=150, r=20, t=50, b=50),
+    margin=dict(l=150, r=20, t=50, b=50),)
 
 # ────────────────────────────────────────────
 # Streamlit layout (two tabs)
