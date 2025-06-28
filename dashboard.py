@@ -1,3 +1,4 @@
+# streamlit_app.py
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
@@ -5,9 +6,9 @@ import plotly.graph_objects as go
 st.set_page_config(page_title="University Dashboard", layout="wide")
 st.title("University Growth & Dept. Enrollment Dashboard")
 
-# ──────────────────────────────────────────
-# Figure 1 – Overall metrics
-# ──────────────────────────────────────────
+# ────────────────────────────────────────────
+# Figure 1 – Overall metrics (3-bar view)
+# ────────────────────────────────────────────
 overall_data = {
     "Metric": ["Total Increase", "Average YoY", "CAGR"],
     "Applications": [40.0, 1.8, 3.8],
@@ -18,36 +19,42 @@ df1 = (
     pd.DataFrame(overall_data)
       .melt(id_vars="Metric", var_name="Category", value_name="Percent")
 )
-palette1 = ["#1f77b4", "#2ca02c", "#d62728"]
 
-fig1 = go.Figure()
-for i, metric in enumerate(df1["Metric"].unique()):
-    sub = df1[df1["Metric"] == metric]
+palette1   = ["#1f77b4", "#2ca02c", "#d62728"]
+metrics1   = df1["Metric"].unique()
+fig1       = go.Figure()
+
+for i, m in enumerate(metrics1):
+    sub = df1[df1["Metric"] == m]
     fig1.add_bar(
         x=sub["Category"],
         y=sub["Percent"],
         marker_color=palette1,
         text=[f"{v:.1f}%" for v in sub["Percent"]],
         textposition="outside",
-        name=metric,
+        name=m,
         visible=i == 0,
     )
 
-buttons1 = [
-    {
-        "label": m,
-        "method": "update",
-        "args": [
-            {"visible": [m == x for x in df1["Metric"].unique()]},
-            {"title": m, "yaxis": {"range": [0, df1[df1.Metric == m].Percent.max() * 1.1]}}
-        ],
-    }
-    for m in df1["Metric"].unique()
-]
+# buttons to toggle metric
+buttons1 = []
+for i, m in enumerate(metrics1):
+    ymax = df1.query("Metric == @m")["Percent"].max() * 1.1
+    vis  = [i == j for j in range(len(metrics1))]
+    buttons1.append(
+        dict(
+            label=m,
+            method="update",
+            args=[
+                {"visible": vis},
+                {"title": m, "yaxis": {"range": [0, ymax]}}
+            ],
+        )
+    )
 
 fig1.update_layout(
     updatemenus=[dict(buttons=buttons1, x=0.02, y=1.15, showactive=True)],
-    title=df1["Metric"].unique()[0],
+    title=metrics1[0],
     title_x=0.5,
     template="plotly_white",
     bargap=0.3,
@@ -56,51 +63,59 @@ fig1.update_layout(
     margin=dict(l=50, r=50, t=100, b=50),
 )
 
-# ──────────────────────────────────────────
-# Figure 2 – Department enrollment % changes
-# ──────────────────────────────────────────
+# ────────────────────────────────────────────
+# Figure 2 – Dept. enrollment % changes
+# ────────────────────────────────────────────
 dept_data = {
-    "Department": ["Arts Enrolled", "Business Enrolled", "Engineering Enrolled", "Science Enrolled"],
-    "Average YoY":   [3.9, 4.7, 4.7, -2.3],
-    "2024 Increase": [6.1, 7.1, 5.3, -13.0],
+    "Department": ["Arts Enrolled", "Business Enrolled",
+                   "Engineering Enrolled", "Science Enrolled"],
+    "Average YoY":   [ 3.9,  4.7,  4.7,  -2.3],
+    "2024 Increase": [ 6.1,  7.1,  5.3, -13.0],
 }
-df2 = pd.DataFrame(dept_data).set_index("Department")
-metrics2 = df2.columns.tolist()
+df2      = pd.DataFrame(dept_data).set_index("Department")
+metrics2 = df2.columns.tolist()        # ["Average YoY", "2024 Increase"]
 depts    = df2.index.tolist()
-palette2 = ["#1f77b4", "#ff7f0e"]
+colors2  = ["#1f77b4", "#ff7f0e"]
+fig2     = go.Figure()
 
-fig2 = go.Figure()
 for i, d in enumerate(depts):
     fig2.add_bar(
         x=metrics2,
         y=df2.loc[d].values,
         name=d,
-        marker_color=palette2,
+        marker_color=colors2,
         text=[f"{v:.1f}%" for v in df2.loc[d].values],
         textposition="outside",
         visible=i == 0,
     )
 
-buttons2 = []
-for i, dept in enumerate(depts):
-    # range that fits that department’s two bars with 10 % head-/foot-room
-    dmin = df2.loc[dept].min() * 1.1
-    dmax = df2.loc[dept].max() * 1.1
-    vis = [j == i for j in range(len(depts))]
+# helper to build symmetric y-ranges with padding
+def pad_range(lo: float, hi: float, pct: float = 0.10):
+    span = max(abs(lo), abs(hi))
+    pad  = span * pct
+    return [lo - pad, hi + pad] if lo < hi else [hi - pad, lo + pad]
 
+# buttons to toggle department with per-dept scaling
+buttons2 = []
+for i, d in enumerate(depts):
+    vis    = [j == i for j in range(len(depts))]
+    lo, hi = df2.loc[d].min(), df2.loc[d].max()
+    yrange = pad_range(lo, hi)
     buttons2.append(
         dict(
-            label=dept,
+            label=d,
             method="update",
             args=[
                 {"visible": vis},
-                {"title": f"{dept}: Enrollment % Changes",
-                 "yaxis": {"range": [dmin, dmax], "title": "Percent"}}
+                {"title": f"{d}: Enrollment % Changes",
+                 "yaxis": {"range": yrange, "title": "Percent"}}
             ],
         )
     )
 
-ymin, ymax = df2.values.min() * 1.2, df2.values.max() * 1.2
+# initial y-axis for first department
+init_yrange = pad_range(df2.iloc[0].min(), df2.iloc[0].max())
+
 fig2.update_layout(
     updatemenus=[dict(
         buttons=buttons2,
@@ -113,13 +128,13 @@ fig2.update_layout(
     title=f"{depts[0]}: Enrollment % Changes",
     title_x=0.5,
     template="plotly_white",
-    yaxis=dict(range=[ymin, ymax], title="Percent"),
+    yaxis=dict(range=init_yrange, title="Percent"),
     margin=dict(l=150, r=20, t=50, b=50),
 )
 
-# ──────────────────────────────────────────
-# Streamlit layout
-# ──────────────────────────────────────────
+# ────────────────────────────────────────────
+# Streamlit layout (two tabs)
+# ────────────────────────────────────────────
 tab1, tab2 = st.tabs(["Overall Metrics", "Dept. Enrollment % Changes"])
 with tab1:
     st.plotly_chart(fig1, use_container_width=True)
