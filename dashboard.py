@@ -4,7 +4,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 st.set_page_config(page_title="University Dashboard", layout="wide")
-st.title("University Growth & Dept. Enrollment Dashboard")
+st.title("University Growth & Department Enrollment Dashboard")
 
 # ────────────────────────────────────────────
 # Figure 1 – Overall metrics (3-bar view)
@@ -107,7 +107,7 @@ for i, d in enumerate(depts):
             method="update",
             args=[
                 {"visible": vis},
-                {"title": f"{d}: Enrollment % Changes",
+                {"title": f"{d} Percent Change",
                  "yaxis": {"range": yrange, "title": "Percent"}}
             ],
         )
@@ -119,8 +119,8 @@ init_yrange = pad_range(df2.iloc[0].min(), df2.iloc[0].max())
 fig2.update_layout(
     updatemenus=[dict(
         buttons=buttons2,
-        direction="down",          # still a vertical list
-        x=0.02, y=1.15,           
+        direction="down",
+        x=0.02, y=1.15,
         xanchor="left", yanchor="top",
         pad={"l": 10, "t": 10},
         showactive=True,
@@ -129,7 +129,8 @@ fig2.update_layout(
     title_x=0.5,
     template="plotly_white",
     yaxis=dict(range=init_yrange, title="Percent"),
-    margin=dict(l=150, r=20, t=50, b=50),)
+    margin=dict(l=150, r=20, t=50, b=50),
+)
 
 # ────────────────────────────────────────────
 # Streamlit layout (two tabs)
@@ -139,4 +140,3 @@ with tab1:
     st.plotly_chart(fig1, use_container_width=True)
 with tab2:
     st.plotly_chart(fig2, use_container_width=True)
-
