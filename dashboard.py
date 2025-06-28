@@ -81,17 +81,24 @@ for i, d in enumerate(depts):
         visible=i == 0,
     )
 
-buttons2 = [
-    {
-        "label": d,
-        "method": "update",
-        "args": [
-            {"visible": [d == x for x in depts]},
-            {"title": f"{d}: Enrollment % Changes"}
-        ],
-    }
-    for d in depts
-]
+buttons2 = []
+for i, dept in enumerate(depts):
+    # range that fits that department’s two bars with 10 % head-/foot-room
+    dmin = df2.loc[dept].min() * 1.1
+    dmax = df2.loc[dept].max() * 1.1
+    vis = [j == i for j in range(len(depts))]
+
+    buttons2.append(
+        dict(
+            label=dept,
+            method="update",
+            args=[
+                {"visible": vis},
+                {"title": f"{dept}: Enrollment % Changes",
+                 "yaxis": {"range": [dmin, dmax], "title": "Percent"}}
+            ],
+        )
+    )
 
 ymin, ymax = df2.values.min() * 1.2, df2.values.max() * 1.2
 fig2.update_layout(
